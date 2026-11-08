@@ -1,0 +1,107 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Release build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Cache pinned dependencies
+        uses: actions/cache@v4
+        with:
+          path: .cache/waypoint-deps
+          key: ${{ runner.os }}-waypoint-deps-${{ hashFiles('external/dependencies.lock.json') }}
+          restore-keys: ${{ runner.os }}-waypoint-deps-
+
+      - name: Set up MSVC (Windows)
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Install Linux desktop dependencies
+        if: runner.os == 'Linux'
+        run: >-
+          sudo apt-get update && sudo apt-get install -y ninja-build
+          libx11-dev libxext-dev libxrandr-dev libxinerama-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev
+          libwayland-dev libxkbcommon-dev libegl1-mesa-dev libgl1-mesa-dev libvulkan-dev
+
+      - name: Install Ninja (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      - name: Install Ninja (Windows)
+        if: runner.os == 'Windows'
+        run: choco install ninja -y
+
+      - name: Configure
+        run: >-
+          cmake -S . -B build/release -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -DFETCHCONTENT_BASE_DIR=${{ github.workspace }}/.cache/waypoint-deps
+          -DWAYPOINT_BUILD_RUNTIME=ON
+          -DWAYPOINT_ENABLE_RENDER=ON
+          -DWAYPOINT_ENABLE_PHYSICS=ON
+          -DWAYPOINT_ENABLE_SCRIPTING=ON
+          -DWAYPOINT_BUILD_EDITOR=OFF
+          -DWAYPOINT_BUILD_TESTS=ON
+          -DWAYPOINT_BUILD_BGFX_TOOLS=ON
+
+      - name: Build
+        run: cmake --build build/release --parallel
+
+      - name: Test
+        run: ctest --test-dir build/release --output-on-failure
+
+      - name: Package
+        shell: bash
+        run: |
+          mkdir -p dist package/waypoint
+          find build/release/runtime -maxdepth 1 -type f -name 'waypoint*' -exec cp {} package/waypoint/ \;
+          if [ -d build/release/runtime/shaders ]; then cp -R build/release/runtime/shaders package/waypoint/shaders; fi
+          cp -R samples templates docs package/waypoint/
+          cp README.md LICENSE NOTICE package/waypoint/
+          cd package
+          cmake -E tar cfv "../dist/waypoint-${{ matrix.os }}.zip" --format=zip waypoint
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: waypoint-release-${{ matrix.os }}
+          path: dist/*.zip
+
+  publish:
+    name: Publish GitHub release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME" dist/*.zip
+          --title "Waypoint Engine $GITHUB_REF_NAME"
+          --generate-notes

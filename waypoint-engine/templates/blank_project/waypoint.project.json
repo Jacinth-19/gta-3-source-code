@@ -1,0 +1,6 @@
+{
+  "name": "MyGame",
+  "engineVersion": "0.1.0",
+  "startScene": "scenes/main.scene.json",
+  "scriptEntry": "scripts/main.lua"
+}

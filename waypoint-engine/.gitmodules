@@ -1,0 +1,45 @@
+[submodule "external/entt"]
+	path = external/entt
+	url = https://github.com/skypjack/entt.git
+[submodule "external/glm"]
+	path = external/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "external/json"]
+	path = external/json
+	url = https://github.com/nlohmann/json.git
+[submodule "external/spdlog"]
+	path = external/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "external/doctest"]
+	path = external/doctest
+	url = https://github.com/doctest/doctest.git
+[submodule "external/sdl"]
+	path = external/sdl
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "external/lua"]
+	path = external/lua
+	url = https://github.com/lua/lua.git
+[submodule "external/sol2"]
+	path = external/sol2
+	url = https://github.com/ThePhD/sol2.git
+[submodule "external/jolt"]
+	path = external/jolt
+	url = https://github.com/jrouwe/JoltPhysics.git
+[submodule "external/bgfx_cmake"]
+	path = external/bgfx_cmake
+	url = https://github.com/bkaradzic/bgfx.cmake.git
+[submodule "external/bgfx"]
+	path = external/bgfx
+	url = https://github.com/bkaradzic/bgfx.git
+[submodule "external/bx"]
+	path = external/bx
+	url = https://github.com/bkaradzic/bx.git
+[submodule "external/bimg"]
+	path = external/bimg
+	url = https://github.com/bkaradzic/bimg.git
+[submodule "external/stb"]
+	path = external/stb
+	url = https://github.com/nothings/stb.git
+[submodule "external/tinygltf"]
+	path = external/tinygltf
+	url = https://github.com/syoyo/tinygltf.git

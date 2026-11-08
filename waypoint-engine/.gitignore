@@ -1,0 +1,19 @@
+build/
+out/
+dist/
+.cache/
+.vs/
+.idea/
+.vscode/
+*.user
+*.spv
+*.bin
+__pycache__/
+*.pyc
+!templates/**/*.bin
+external/_deps/
+
+# Local dependency cache created by tools/wp.py deps fetch (not committed).
+external/*/
+!external/README.md
+!external/dependencies.lock.json

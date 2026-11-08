@@ -1,0 +1,51 @@
+name: Android
+
+on:
+  workflow_dispatch:
+
+jobs:
+  android-compile:
+    name: Android native compile check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Cache pinned dependencies
+        uses: actions/cache@v4
+        with:
+          path: .cache/waypoint-deps
+          key: ${{ runner.os }}-waypoint-deps-${{ hashFiles('external/dependencies.lock.json') }}
+          restore-keys: ${{ runner.os }}-waypoint-deps-
+
+      - name: Install host tools
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install NDK
+        run: sdkmanager --install "ndk;27.0.12077973"
+
+      - name: Configure Android native build
+        run: >-
+          cmake -S . -B build/android -G Ninja
+          -DCMAKE_TOOLCHAIN_FILE=$ANDROID_HOME/ndk/27.0.12077973/build/cmake/android.toolchain.cmake
+          -DANDROID_ABI=arm64-v8a
+          -DANDROID_PLATFORM=android-26
+          -DCMAKE_BUILD_TYPE=Release
+          -DFETCHCONTENT_BASE_DIR=${{ github.workspace }}/.cache/waypoint-deps
+          -DWAYPOINT_BUILD_RUNTIME=OFF
+          -DWAYPOINT_BUILD_EDITOR=OFF
+          -DWAYPOINT_BUILD_TESTS=OFF
+          -DWAYPOINT_ENABLE_RENDER=ON
+          -DWAYPOINT_ENABLE_PHYSICS=ON
+          -DWAYPOINT_ENABLE_SCRIPTING=ON
+
+      - name: Build Android native engine
+        run: cmake --build build/android --parallel

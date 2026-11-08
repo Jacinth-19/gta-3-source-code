@@ -1,0 +1,78 @@
+{
+  "name": "Main",
+  "entities": [
+    {
+      "id": 1,
+      "name": "Camera",
+      "transform": {
+        "position": [0.0, 2.0, 8.0],
+        "rotation": [1.0, 0.0, 0.0, 0.0],
+        "scale": [1.0, 1.0, 1.0]
+      },
+      "components": {
+        "camera": {
+          "verticalFovDegrees": 60.0,
+          "nearPlane": 0.1,
+          "farPlane": 1000.0,
+          "primary": true
+        },
+        "flyCamera": {
+          "moveSpeed": 6.0,
+          "boostMultiplier": 3.0,
+          "lookSensitivity": 0.1,
+          "yawDegrees": 0.0,
+          "pitchDegrees": -10.0
+        }
+      }
+    },
+    {
+      "id": 2,
+      "name": "Sun",
+      "transform": {
+        "position": [0.0, 10.0, 0.0],
+        "rotation": [0.894, -0.224, 0.332, 0.083],
+        "scale": [1.0, 1.0, 1.0]
+      },
+      "components": {
+        "directionalLight": {
+          "color": [1.0, 0.96, 0.9],
+          "intensity": 1.0
+        }
+      }
+    },
+    {
+      "id": 3,
+      "name": "Falling Cube",
+      "transform": {
+        "position": [0.0, 5.0, 0.0],
+        "rotation": [1.0, 0.0, 0.0, 0.0],
+        "scale": [0.5, 0.5, 0.5]
+      },
+      "components": {
+        "meshRenderer": {
+          "mesh": "cube",
+          "material": "default"
+        },
+        "rigidBody": {
+          "dynamic": true,
+          "halfExtent": [0.5, 0.5, 0.5]
+        }
+      }
+    },
+    {
+      "id": 4,
+      "name": "Floor",
+      "transform": {
+        "position": [0.0, -1.0, 0.0],
+        "rotation": [1.0, 0.0, 0.0, 0.0],
+        "scale": [1.0, 1.0, 1.0]
+      },
+      "components": {
+        "rigidBody": {
+          "dynamic": false,
+          "halfExtent": [50.0, 0.5, 50.0]
+        }
+      }
+    }
+  ]
+}
